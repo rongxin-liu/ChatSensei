@@ -105,6 +105,7 @@ async function query(content: string, task: string = 'default') {
                 if (message === '[DONE]') {
                     conversation[conversation.length - 1].content = buffer;
                     updateWebviewPanel(flattenMessages(conversation));
+                    sendWebviewCommand('update_finished');
                     return;
                 }
 
@@ -142,6 +143,10 @@ function openPanel() {
 function resetConversation() {
     conversation = [tasks.default];
     panel ? updateWebviewPanel(flattenMessages(conversation)) : null;
+}
+
+function sendWebviewCommand(command: string) {
+    panel?.webview.postMessage({ command: command });
 }
 
 function createWebviewPanel(context: vscode.ExtensionContext) {

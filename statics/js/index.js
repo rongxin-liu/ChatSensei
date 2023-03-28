@@ -1,9 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    let delta = document.querySelector('#delta');
+    const delta = document.getElementById('delta');
 
     window.addEventListener('message', event => {
         switch (event.data.command) {
+            case 'update_finished':
+                const pres = document.querySelectorAll('pre');
+                pres.forEach(block => {
+                    block.style.cursor = 'copy';
+                    block.classList.add('copy-cursor');
+                    block.addEventListener('click', () => {
+                        const textToCopy = block.textContent;
+                        navigator.clipboard.writeText(textToCopy)
+                            .then(() => {
+                                block.classList.add('copy-feedback');
+                                setTimeout(() => {
+                                    block.classList.remove('copy-feedback');
+                                }, 1000);
+                            })
+                            .catch(err => {
+                                console.error('Failed to copy text: ', err);
+                            });
+                    });
+                });
+                break;
+
             case 'delta_update':
                 let tmp = '';
                 for (var i = 0; i < event.data.content.length; i++) {
@@ -15,9 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     // Note: system role message is hidden
                 }
-               delta.innerHTML = tmp;
-               window.scrollTo(0,document.body.scrollHeight);
-               break;
+                delta.innerHTML = tmp;
+                window.scrollTo(0, document.body.scrollHeight);
+                break;
         }
     });
 });
+
+

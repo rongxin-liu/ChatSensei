@@ -23,3 +23,26 @@ pre {
     background-color: #ffffff;
     padding: 10px;
 }
+
+/* Define a CSS animation that causes an element to pulse when it is clicked */
+@keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: none;
+    }
+    50% {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: none;
+    }
+  }
+
+  /* Add the animation to the copy-feedback class */
+  .copy-feedback {
+    animation-name: pulse;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out;
+  }
