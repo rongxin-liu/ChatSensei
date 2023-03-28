@@ -17,10 +17,10 @@ const tasks: TasksDictionary = {
         role: "system",
         content: "You are a helpful assistant."
     },
-    'codeImprovement': {
-        title: 'Improve this code',
+    'codeOptimiation': {
+        title: 'Optimize this code',
         role: "system",
-        content: "You are a senior software engineer. Your task is to provide recommendations on how to improve the code snippet."
+        content: "You are a senior software engineer. Your task is to optimize the provided code snippet."
     },
     'codeReview': {
         title: 'Review this code',
