@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
+import { tasks } from './tasks';
 const { Configuration, OpenAIApi } = require("openai");
 const highlightjs = require('markdown-it-highlightjs');
 const md = require('markdown-it')();
@@ -17,11 +18,10 @@ let panel: vscode.WebviewPanel | undefined;
 interface Message {
     role: string;
     content: string;
-    name?: string;
+    title?: string;
 }
 
-const systemMessage: Message = { role: "system", content: "You are a helpful assistant." };
-let conversation: Message[] = [systemMessage];
+let conversation: Message[] = [tasks.default];
 
 async function init(context: vscode.ExtensionContext) {
     _context = context;
@@ -65,13 +65,20 @@ function unsetKey() {
     vscode.window.showInformationMessage('OpenAI API key has been unset');
 }
 
-async function ask(content: string) {
+function codeAction(task: string, text: string) {
+    query(text, task);
+}
+
+async function query(content: string, task: string = 'default') {
+
     !didSetApiKey ? await requestKey() : null;
     panel === undefined ? createWebviewPanel(_context) : null;
+    setRole(tasks[task]);
 
     conversation.push({ role: "user", content: content });
     updateWebviewPanel(flattenMessages(conversation));
 
+    console.log(conversation);
     try {
         const response = await openai.createChatCompletion(
             {
@@ -118,13 +125,22 @@ async function ask(content: string) {
     }
 }
 
+function setRole(role: Message) {
+
+    // create a hard copy of the role object
+    role = JSON.parse(JSON.stringify(role));
+    delete role.title;
+    conversation[0] = role;
+    panel ? updateWebviewPanel(flattenMessages(conversation)) : null;
+}
+
 function openPanel() {
     panel === undefined ? createWebviewPanel(_context) : null;
     updateWebviewPanel(flattenMessages(conversation));
 }
 
 function resetConversation() {
-    conversation = [systemMessage];
+    conversation = [tasks.default];
     panel ? updateWebviewPanel(flattenMessages(conversation)) : null;
 }
 
@@ -240,4 +256,4 @@ function encode(str: any) {
     return String(Buffer.from(String(str), 'binary').toString('base64'));
 }
 
-export { init, openPanel, requestKey, unsetKey, ask, resetConversation };
+export { init, openPanel, requestKey, unsetKey, query, codeAction, resetConversation };

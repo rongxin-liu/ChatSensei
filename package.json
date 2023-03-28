@@ -26,7 +26,7 @@
                 "title": "ChatSensei: Open Panel"
             },
             {
-                "command": "chatsensei.ask",
+                "command": "chatsensei.query",
                 "title": "ChatSensei: Ask ChatSensei"
             },
             {

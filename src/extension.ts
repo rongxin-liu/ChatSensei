@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as model from './model';
+import * as tasks from './tasks';
 
 const commands: vscode.Disposable[] = [];
 
@@ -14,11 +15,11 @@ export function activate(context: vscode.ExtensionContext) {
         }));
 
     commands.push(
-        vscode.commands.registerCommand('chatsensei.ask', () => {
+        vscode.commands.registerCommand('chatsensei.query', () => {
         const placeHolder = "Send a message to ChatSensei...";
         vscode.window.showInputBox({ placeHolder: placeHolder })
         .then((input) => {
-            input !== undefined ? model.ask(input) : null;
+            input !== undefined ? model.query(input) : null;
         });
     }));
 
@@ -47,6 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 function init(context: vscode.ExtensionContext) {
     model.init(context);
+    tasks.registerTasks(context);
 }
 
 function subscribeAll(context: vscode.ExtensionContext, disposables: vscode.Disposable[]) {
