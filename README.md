@@ -2,7 +2,7 @@
 
 Powered by OpenAI's GPT model, ChatSensei is a lightweight extension allowing users to seamlessly interact with GPT within VS Code, providing a chat-like experience. It also offers quick-fix programming features such as code completion, translation, review, commenting, and more.
 
-![Alt Text](/images/demo.gif)
+![Alt Text](https://raw.githubusercontent.com/rongxin-liu/ChatSensei/main/images/demo.gif)
 
 ## Features
 
