@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as model from './model';
 import * as tasks from './tasks';
+import * as panel from './panel';
 
 const commands: vscode.Disposable[] = [];
 
@@ -10,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     commands.push(
         vscode.commands.registerCommand('chatsensei.openPanel', () => {
-            model.openPanel();
+            panel.openPanel(context);
         }));
 
     commands.push(
