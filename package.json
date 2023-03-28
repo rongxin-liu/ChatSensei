@@ -1,8 +1,8 @@
 {
     "name": "chatsensei",
-    "displayName": "ChatSensei",
+    "displayName": "ChatSensei (A GPT Interface)",
     "description": "AI-powered creative assistant",
-    "publisher": "Rongxin Liu",
+    "publisher": "RongxinLiu",
     "icon": "images/chatsensei.png",
     "repository": {
         "type": "git",
