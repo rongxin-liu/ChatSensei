@@ -1,14 +1,14 @@
 {
     "name": "chatsensei",
     "displayName": "ChatSensei (A GPT Interface)",
-    "description": "AI-powered creative assistant",
+    "description": "GPT extension for VS Code",
     "publisher": "RongxinLiu",
     "icon": "images/chatsensei.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/rongxin-liu/ChatSensei.git"
     },
-    "version": "1.0.1",
+    "version": "1.0.2",
     "preview": true,
     "engines": {
         "vscode": "^1.76.0"
