@@ -22,8 +22,28 @@
     "contributes": {
         "commands": [
             {
+                "command": "chatsensei.openPanel",
+                "title": "ChatSensei: Open Panel"
+            },
+            {
                 "command": "chatsensei.ask",
-                "title": "Ask ChatSensei"
+                "title": "ChatSensei: Ask ChatSensei"
+            },
+            {
+                "command": "chatsensei.resetConversation",
+                "title": "ChatSensei: Reset Conversation"
+            },
+            {
+                "command": "chatsensei.checkUsage",
+                "title": "ChatSensei: Check OpenAI API Usage"
+            },
+            {
+                "command": "chatsensei.requestKey",
+                "title": "ChatSensei: Set OpenAI API Key"
+            },
+            {
+                "command": "chatsensei.unsetKey",
+                "title": "ChatSensei: Unset OpenAI API Key"
             }
         ]
     },

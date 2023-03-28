@@ -9,6 +9,11 @@ export function activate(context: vscode.ExtensionContext) {
     init(context);
 
     commands.push(
+        vscode.commands.registerCommand('chatsensei.openPanel', () => {
+            model.openPanel();
+        }));
+
+    commands.push(
         vscode.commands.registerCommand('chatsensei.ask', () => {
         const placeHolder = "Send a message to ChatSensei...";
         vscode.window.showInputBox({ placeHolder: placeHolder })
@@ -16,6 +21,26 @@ export function activate(context: vscode.ExtensionContext) {
             input !== undefined ? model.ask(input) : null;
         });
     }));
+
+    commands.push(
+        vscode.commands.registerCommand('chatsensei.requestKey', () => {
+            model.requestKey();
+        }));
+
+    commands.push(
+        vscode.commands.registerCommand('chatsensei.unsetKey', () => {
+            model.unsetKey();
+        }));
+
+    commands.push(
+        vscode.commands.registerCommand('chatsensei.checkUsage', () => {
+            vscode.env.openExternal(vscode.Uri.parse("https://platform.openai.com/account/usage"));
+        }));
+
+    commands.push(
+        vscode.commands.registerCommand('chatsensei.resetConversation', () => {
+            model.resetConversation();
+        }));
 
     subscribeAll(context, commands);
 }

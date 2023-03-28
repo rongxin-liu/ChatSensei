@@ -21,7 +21,7 @@ interface Message {
 }
 
 const systemMessage: Message = { role: "system", content: "You are a helpful assistant." };
-const conversation: Message[] = [systemMessage];
+let conversation: Message[] = [systemMessage];
 
 async function init(context: vscode.ExtensionContext) {
     _context = context;
@@ -36,6 +36,7 @@ async function requestKey() {
         ignoreFocusOut: true,
     }).then((value) => {
         setKey(value || '');
+        value ? vscode.window.showInformationMessage('API key set successfully') : null;
     });
 }
 
@@ -43,7 +44,7 @@ function setKey(key: string) {
     try {
         key = key.trim();
         if (key.length === 0) {
-            throw new Error('API key is empty.');
+            throw new Error('API key is empty');
         }
         configuration = new Configuration({ apiKey: key });
         openai = new OpenAIApi(configuration);
@@ -57,10 +58,11 @@ function setKey(key: string) {
     return true;
 }
 
-function removeKey() {
+function unsetKey() {
     openai = new OpenAIApi(new Configuration());
     _context.globalState.update('chatsensei.apiKey', undefined);
     didSetApiKey = false;
+    vscode.window.showInformationMessage('OpenAI API key has been unset');
 }
 
 async function ask(content: string) {
@@ -114,6 +116,16 @@ async function ask(content: string) {
     catch (error: any) {
         console.log(error.response.data);
     }
+}
+
+function openPanel() {
+    panel === undefined ? createWebviewPanel(_context) : null;
+    updateWebviewPanel(flattenMessages(conversation));
+}
+
+function resetConversation() {
+    conversation = [systemMessage];
+    panel ? updateWebviewPanel(flattenMessages(conversation)) : null;
 }
 
 function createWebviewPanel(context: vscode.ExtensionContext) {
@@ -228,4 +240,4 @@ function encode(str: any) {
     return String(Buffer.from(String(str), 'binary').toString('base64'));
 }
 
-export { init, setKey, ask };
+export { init, openPanel, requestKey, unsetKey, ask, resetConversation };
