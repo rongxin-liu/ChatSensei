@@ -3,11 +3,9 @@ import * as vscode from 'vscode';
 import { createWebviewPanel, sendWebviewCommand, updateWebviewPanel } from './panel';
 import { tasks } from './tasks';
 const { Configuration, OpenAIApi } = require("openai");
-const highlightjs = require('markdown-it-highlightjs');
-const md = require('markdown-it')();
-md.use(highlightjs);
 
-interface Message {
+
+export interface Message {
     role: string;
     content: string;
     title?: string;
@@ -17,7 +15,8 @@ let openai: any;
 let configuration: any;
 let _context: vscode.ExtensionContext;
 let didSetApiKey: boolean = false;
-let conversation: Message[] = [tasks.default];
+let processing: boolean = false;
+export let conversation: Message[] = [tasks.default];
 
 async function init(context: vscode.ExtensionContext) {
     _context = context;
@@ -66,13 +65,13 @@ function codeAction(task: string, text: string) {
 }
 
 async function query(content: string, task: string = 'default') {
-
+    if (processing) { return; }
     !didSetApiKey ? await requestKey() : null;
     createWebviewPanel(_context);
     setRole(tasks[task]);
 
     conversation.push({ role: "user", content: content });
-    updateWebviewPanel(flattenMessages(conversation));
+    updateWebviewPanel(conversation);
     sendWebviewCommand('scroll_to_bottom');
     sendWebviewCommand('disable_input');
     try {
@@ -87,6 +86,7 @@ async function query(content: string, task: string = 'default') {
         conversation.push({ role: "assistant", content: '' });
         let buffer: string = '';
         response.data.on('data', (data: { toString: () => string; }) => {
+            processing = true;
 
             // Split stream data into lines and filter out empty lines
             const lines = data.toString().split('\n').filter((line: string) => line.trim() !== '');
@@ -100,9 +100,10 @@ async function query(content: string, task: string = 'default') {
                 // Stream finished, perform final delta update
                 if (message === '[DONE]') {
                     conversation[conversation.length - 1].content = buffer;
-                    updateWebviewPanel(flattenMessages(conversation));
+                    updateWebviewPanel(conversation);
                     sendWebviewCommand('update_finished');
                     sendWebviewCommand('enable_input');
+                    processing = false;
                     return;
                 }
 
@@ -112,13 +113,15 @@ async function query(content: string, task: string = 'default') {
                     content !== undefined ? buffer += content : null;
                     conversation[conversation.length - 1].content = buffer;
                 } catch (error) {
+                    processing = false;
                     console.error('Could not JSON parse stream message', message, error);
                 }
             }
-            updateWebviewPanel(flattenMessages(conversation));
+            updateWebviewPanel(conversation);
         });
     }
     catch (error: any) {
+        processing = false;
         console.log(error.response.data);
     }
 }
@@ -127,25 +130,12 @@ function setRole(role: Message) {
     role = JSON.parse(JSON.stringify(role));
     delete role.title;
     conversation[0] = role;
-    updateWebviewPanel(flattenMessages(conversation));
+    updateWebviewPanel(conversation);
 }
 
 function resetConversation() {
     conversation = [tasks.default];
-    updateWebviewPanel(flattenMessages(conversation));
-}
-
-// update each content field with parsed markdown
-function flattenMessages(messages: Message[]) {
-    const tmp: Message[] = [];
-    messages.map((message) => {
-        tmp.push({
-            role: message.role,
-            content: md.render(message.content),
-        });
-        return message;
-    });
-    return tmp;
+    updateWebviewPanel(conversation);
 }
 
 // Base64 decoding

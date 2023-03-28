@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
-import { query } from './model';
+import { query, conversation, Message } from './model';
+const highlightjs = require('markdown-it-highlightjs');
+const md = require('markdown-it')();
+md.use(highlightjs);
 
 const STATICS = 'statics';
 let panel: vscode.WebviewPanel | undefined;
@@ -88,6 +91,10 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
 
     panel.webview.html = htmlString;
 
+    if (conversation.length >= 2) {
+        updateWebviewPanel(conversation);
+    }
+
     panel.webview.onDidReceiveMessage(
         message => {
             switch (message.command) {
@@ -109,8 +116,21 @@ function updateWebviewPanel(content: any) {
     panel?.webview.postMessage(
         {
             command: 'delta_update',
-            content: content
+            content: flattenMessages(content)
         });
+}
+
+// update each content field with parsed markdown
+function flattenMessages(messages: Message[]) {
+    const tmp: Message[] = [];
+    messages.map((message) => {
+        tmp.push({
+            role: message.role,
+            content: md.render(message.content),
+        });
+        return message;
+    });
+    return tmp;
 }
 
 function openPanel(context: vscode.ExtensionContext) {
