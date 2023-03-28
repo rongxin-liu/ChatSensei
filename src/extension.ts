@@ -5,7 +5,6 @@ import * as tasks from './tasks';
 const commands: vscode.Disposable[] = [];
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log("chatSensei is now active!");
 
     init(context);
 

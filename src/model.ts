@@ -77,8 +77,8 @@ async function query(content: string, task: string = 'default') {
 
     conversation.push({ role: "user", content: content });
     updateWebviewPanel(flattenMessages(conversation));
-
-    console.log(conversation);
+    sendWebviewCommand('scroll_to_bottom');
+    sendWebviewCommand('disable_input');
     try {
         const response = await openai.createChatCompletion(
             {
@@ -106,6 +106,7 @@ async function query(content: string, task: string = 'default') {
                     conversation[conversation.length - 1].content = buffer;
                     updateWebviewPanel(flattenMessages(conversation));
                     sendWebviewCommand('update_finished');
+                    sendWebviewCommand('enable_input');
                     return;
                 }
 
@@ -215,8 +216,13 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
             </style>
         </head>
         <body>
-            <div id="delta">
-                <div class="loadingspinner"></div>
+            <div id="chatContainer">
+                <div id="chatBody">
+                    <div class="loadingspinner"></div>
+                </div>
+                <div id="chatInput">
+                    <textarea></textarea>
+                </div>
             </div>
         </body>
         <script src="${highlightjsUri}"></script>
@@ -224,6 +230,18 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
     </html>`.trim();
 
     panel.webview.html = htmlString;
+
+    panel.webview.onDidReceiveMessage(
+        message => {
+            switch (message.command) {
+              case 'query_model':
+                query(message.content);
+                return;
+            }
+          },
+          undefined,
+          context.subscriptions
+        );
 
     panel.onDidDispose(() => {
         panel = undefined;

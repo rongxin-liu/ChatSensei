@@ -1,19 +1,15 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+}
+
 body p {
     line-height: 1.5;
-}
-
-.user {
-    background-color: #343540;
-    border-radius: 3px;
-    padding:10px;
-    margin: 10px 0;
-}
-
-.assistant {
-    background-color: #444653;
-    border-radius: 3px;
-    padding: 10px;
-    margin: 10px 0;
 }
 
 pre code {
@@ -25,25 +21,81 @@ pre {
     padding: 10px;
 }
 
+.user {
+    background-color: #343540;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 10px;
+}
+
+.assistant {
+    background-color: #444653;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 10px;
+}
+
 /* Define a CSS animation that causes an element to pulse when it is clicked */
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: none;
-  }
-  50% {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: none;
-  }
+    0% {
+        transform: scale(1);
+        box-shadow: none;
+    }
+
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: none;
+    }
 }
 
 /* Add the animation to the copy-feedback class */
 .copy-feedback {
-  animation-name: pulse;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out;
+    animation-name: pulse;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out;
+}
+
+#chatContainer {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#chatBody {
+    overflow: auto;
+}
+
+#chatInput {
+    margin-top: 10px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+    margin-left: 10px;
+}
+
+#chatInput textarea {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-family: sans-serif;
+    height: 100%;
+    padding: 10px;
+    width: 100%;
+    resize: none;
+}
+
+#chatInput textarea:focus {
+    outline: none;
+}
+
+body.vscode-dark #chatInput textarea {
+    border-radius: 3px;
+    border-top: 2px solid #e0e0e0;
+    background-color: #343540;
 }

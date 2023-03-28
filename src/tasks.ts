@@ -61,7 +61,22 @@ const tasks: TasksDictionary = {
         title: 'Refactor this code',
         role: "system",
         content: "You are a senior software engineer. Your task is to refactor the code snippet provided to you."
-    }
+    },
+    'codeTesting': {
+        title: 'Write test for this code',
+        role: "system",
+        content: "You are a senior software engineer. Your task is to write tests for the code snippet provided to you."
+    },
+    'codeTranslation': {
+        title: 'Translate this code',
+        role: "system",
+        content: "You are a senior software engineer. Your task is to translate the code snippet provided to you. The user will tell you the desired language."
+    },
+    'codeCustomAction': {
+        title: 'AMA about this code',
+        role: "system",
+        content: "You are a senior software engineer. Your task is to answer any questions about the code snippet provided to you. The user will ask you questions."
+    },
 };
 
 function registerTasks(context: vscode.ExtensionContext) {

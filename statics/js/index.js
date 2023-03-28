@@ -1,9 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const delta = document.getElementById('delta');
+    const vscode = acquireVsCodeApi();
+
+    function sendMessage(message) {
+        if (message) {
+            vscode.postMessage({
+                command: 'query_model',
+                content: message
+            });
+        }
+    }
+
+    const chatBody = document.getElementById('chatBody');
+    const textarea = document.querySelector('#chatInput textarea');
+    textarea.focus();
+    textarea.addEventListener('keypress', (event) => {
+        if (event.key === "Enter" && event.ctrlKey) {
+            event.preventDefault();
+            let textBox = event.target;
+            textBox.value = textBox.value.slice(0, textBox.selectionStart) + "\n" + textBox.value.slice(textBox.selectionEnd);
+        } else if (event.key === 'Enter' && event.target.value) {
+            event.preventDefault();
+            sendMessage(event.target.value);
+            event.target.value = '';
+        }
+
+    });
 
     window.addEventListener('message', event => {
         switch (event.data.command) {
+
+            case 'delta_update':
+                let tmp = '';
+                for (var i = 0; i < event.data.content.length; i++) {
+                    if (event.data.content[i].role === 'user') {
+                        tmp += `<div class="user">${event.data.content[i].content}</div>`;
+                    }
+                    if (event.data.content[i].role === 'assistant') {
+                        tmp += `<div class="assistant">${event.data.content[i].content}</div>`;
+                    }
+                    // Note: system role message is hidden
+                }
+                chatBody.innerHTML = tmp;
+                chatBody.scrollTop = chatBody.scrollHeight;
+                break;
+
             case 'update_finished':
                 const pres = document.querySelectorAll('pre');
                 pres.forEach(block => {
@@ -25,19 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 break;
 
-            case 'delta_update':
-                let tmp = '';
-                for (var i = 0; i < event.data.content.length; i++) {
-                    if (event.data.content[i].role === 'user') {
-                        tmp += `<div class="user">${event.data.content[i].content}</div>`;
-                    }
-                    if (event.data.content[i].role === 'assistant') {
-                        tmp += `<div class="assistant">${event.data.content[i].content}</div>`;
-                    }
-                    // Note: system role message is hidden
-                }
-                delta.innerHTML = tmp;
-                window.scrollTo(0, document.body.scrollHeight);
+            case 'disable_input':
+                textarea.disabled = true;
+                break;
+
+            case 'enable_input':
+                textarea.disabled = false;
+                textarea.focus();
+                break;
+
+            case 'scroll_to_bottom':
+                scrollToBottom();
                 break;
         }
     });
