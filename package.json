@@ -19,6 +19,14 @@
     "activationEvents": [
         "onStartupFinished"
     ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "chatsensei.ask",
+                "title": "Ask ChatSensei"
+            }
+        ]
+    },
     "main": "./out/extension.js",
     "scripts": {
         "vscode:prepublish": "npm run compile",
