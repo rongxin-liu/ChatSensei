@@ -18,7 +18,7 @@ interface Message {
     role: string;
     content: string;
     name?: string;
-  }
+}
 
 const systemMessage: Message = { role: "system", content: "You are a helpful assistant." };
 const conversation: Message[] = [systemMessage];
@@ -70,32 +70,50 @@ async function ask(content: string) {
     conversation.push({ role: "user", content: content });
     updateWebviewPanel(flattenMessages(conversation));
 
-    openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: conversation
-    }).then((response: any) => {
+    try {
+        const response = await openai.createChatCompletion(
+            {
+                model: "gpt-3.5-turbo",
+                messages: conversation,
+                stream: true
+            }, { responseType: 'stream' });
 
-        conversation.push({ role: "assistant", content: response.data.choices[0].message.content });
-        updateWebviewPanel(flattenMessages(conversation));
 
-    }).catch((error: any) => {
-        console.log(error.response.data);
-        error.response.data.code === 'invalid_api_key' ? removeKey() : null;
-        vscode.window.showErrorMessage(`Error occurred: ${error}`);
-    });
-}
+        conversation.push({ role: "assistant", content: '' });
+        let buffer: string = '';
+        response.data.on('data', (data: { toString: () => string; }) => {
 
-// update each content field with parsed markdown
-function flattenMessages(messages: Message[]) {
-    const tmp: Message[] = [];
-    messages.map((message) => {
-        tmp.push({
-            role: message.role,
-            content: md.render(message.content),
+            // Split stream data into lines and filter out empty lines
+            const lines = data.toString().split('\n').filter((line: string) => line.trim() !== '');
+
+            // Process each line of stream data
+            for (const line of lines) {
+
+                // Strip 'data: ' prefix from line
+                const message = line.replace(/^data: /, '');
+
+                // Stream finished, perform final delta update
+                if (message === '[DONE]') {
+                    conversation[conversation.length - 1].content = buffer;
+                    updateWebviewPanel(flattenMessages(conversation));
+                    return;
+                }
+
+                // Parse JSON message, extract content and update buffer
+                try {
+                    const content = JSON.parse(message).choices[0].delta.content;
+                    content !== undefined ? buffer += content : null;
+                    conversation[conversation.length - 1].content = buffer;
+                } catch (error) {
+                    console.error('Could not JSON parse stream message', message, error);
+                }
+            }
+            updateWebviewPanel(flattenMessages(conversation));
         });
-        return message;
-    });
-    return tmp;
+    }
+    catch (error: any) {
+        console.log(error.response.data);
+    }
 }
 
 function createWebviewPanel(context: vscode.ExtensionContext) {
@@ -116,13 +134,13 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
     if (isLightTheme) {
         styleUri = panel.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATICS}/css/light.css`
-        ));
+            ));
         highlightStyleUri = panel.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATICS}/vendor/highlightjs/11.7.0/styles/github.min.css`));
     } else {
         styleUri = panel.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATICS}/css/dark.css`
-        ));
+            ));
         highlightStyleUri = panel.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extension.extensionUri, `${STATICS}/vendor/highlightjs/11.7.0/styles/github-dark.min.css`));
     }
@@ -134,7 +152,7 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
         vscode.Uri.joinPath(context.extension.extensionUri, `${STATICS}/vendor/highlightjs/11.7.0/highlight.min.js`));
 
     const htmlString =
-    `<!DOCTYPE html>
+        `<!DOCTYPE html>
     <html>
         <head>
             <meta charset="utf-8">
@@ -171,6 +189,7 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
         <script src="${highlightjsUri}"></script>
         <script src="${scriptUri}"></script>
     </html>`.trim();
+
     panel.webview.html = htmlString;
 
     panel.onDidDispose(() => {
@@ -186,13 +205,26 @@ function updateWebviewPanel(content: any) {
         });
 }
 
+// update each content field with parsed markdown
+function flattenMessages(messages: Message[]) {
+    const tmp: Message[] = [];
+    messages.map((message) => {
+        tmp.push({
+            role: message.role,
+            content: md.render(message.content),
+        });
+        return message;
+    });
+    return tmp;
+}
+
 // Base64 decoding
-function decode (str: any) {
+function decode(str: any) {
     return String(Buffer.from(String(str), 'base64').toString('binary'));
 }
 
 // Base64 encoding
-function encode (str: any) {
+function encode(str: any) {
     return String(Buffer.from(String(str), 'binary').toString('base64'));
 }
 

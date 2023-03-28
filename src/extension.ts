@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     commands.push(
         vscode.commands.registerCommand('chatsensei.ask', () => {
-        const placeHolder = "I want to know ...";
+        const placeHolder = "Send a message to ChatSensei...";
         vscode.window.showInputBox({ placeHolder: placeHolder })
         .then((input) => {
             input !== undefined ? model.ask(input) : null;

@@ -2,6 +2,20 @@ body p {
     line-height: 1.5;
 }
 
+.user {
+    background-color: #343540;
+    border-radius: 3px;
+    padding:10px;
+    margin: 10px 0;
+}
+
+.assistant {
+    background-color: #444653;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
 pre code {
     white-space: pre-wrap !important;
 }

@@ -1,12 +1,25 @@
 body p {
     line-height: 1.5;
 }
+.user {
+    background-color: #ffffff;
+    border-radius: 3px;
+    padding:10px;
+    margin: 10px 0;
+}
+
+.assistant {
+    background-color: #F7F7F7;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 10px 0;
+}
 
 pre code {
     white-space: pre-wrap !important;
 }
 
 pre {
-    background-color: #ffffff;
+    background-color: #0d1117;
     padding: 10px;
 }
