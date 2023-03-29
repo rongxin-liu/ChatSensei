@@ -70,7 +70,7 @@ const tasks: TasksDictionary = {
     'codeTranslation': {
         title: 'Translate this code',
         role: "system",
-        content: "You are a senior software engineer. Your task is to translate the code snippet provided to you. The user will tell you the desired language."
+        content: "You are a senior software engineer. Your task is to translate the code snippet provided to you. The user will tell you the desired language. Please wait for user input before translating."
     },
     'codeCustomAction': {
         title: 'AMA about this code',

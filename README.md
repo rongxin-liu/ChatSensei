@@ -1,19 +1,19 @@
 # ChatSensei
 
-Powered by OpenAI's GPT model, ChatSensei is a lightweight extension allowing users to seamlessly interact with GPT within VS Code, providing a chat-like experience. It also offers quick-fix programming features such as code completion, translation, review, commenting, and more.
+No more switching between web browsers, ChatSensei offers a full ChatGPT experience in VS Code, allowing users to interact with GPT seamlessly. It also adds common quick-fix programming features such as code completion, translation, review, commenting, etc. It could also perform other general-purpose tasks that GPT models offer.
 
 ![Alt Text](https://raw.githubusercontent.com/rongxin-liu/ChatSensei/main/images/demo.gif)
 
 ## Features
 
-1. Interact with GPT within VS Code in a ChatSensei-like experience.
+1. ChatGPT in your VS Code.
 2. Perform quick-fix code action on any selected code snippet (offers optimization, debugging, testing suggestions, and more).
-3. One-click copy-paste code snippet from the conversation panel to VS Code text editor.
+3. One-click copy-paste code snippet from the chat panel to VS Code editor.
 
 ## Usage
 
 1. Select a range of code snippets in the text editor and choose a code action from the quick-fix menu to query the GPT model for suggestions.
-2. Or use it as a general assistant and ask ChatSensei anything within VS Code.
+2. Use it as a general assistant and ask ChatGPT anything within VS Code. Open the command palette and search `Ask ChatSensei` or `Open Panel`. Ask anything you want.
 
 ## Requirements
 

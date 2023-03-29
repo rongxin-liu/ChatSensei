@@ -1,14 +1,14 @@
 {
     "name": "chatsensei",
-    "displayName": "ChatSensei (A GPT Interface)",
-    "description": "GPT extension for VS Code",
+    "displayName": "GPT (ChatSensei)",
+    "description": "A full ChatGPT experience in VS Code with added features tailored for programmers.",
     "publisher": "RongxinLiu",
     "icon": "images/chatsensei.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/rongxin-liu/ChatSensei.git"
     },
-    "version": "1.0.2",
+    "version": "1.0.3",
     "preview": true,
     "engines": {
         "vscode": "^1.76.0"
