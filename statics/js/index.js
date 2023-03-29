@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case 'scroll_to_bottom':
-                scrollToBottom();
+                chatBody.scrollTop = chatBody.scrollHeight;
                 break;
         }
     });
