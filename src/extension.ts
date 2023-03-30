@@ -30,6 +30,20 @@ export function activate(context: vscode.ExtensionContext) {
         }));
 
     commands.push(
+        vscode.commands.registerCommand('chatsensei.setRole', async () => {
+            await vscode.window.showInputBox({
+                prompt: 'Please define the ',
+                placeHolder: 'You are a ..., your task is to ...',
+                ignoreFocusOut: true,
+            }).then((value) => {
+                if (value !== undefined && value.trim().length > 0) {
+                    model.setRole({ role: 'system', content: String(value) });
+                    panel.openPanel(context);
+                }
+            });
+        }));
+
+    commands.push(
         vscode.commands.registerCommand('chatsensei.query', () => {
         const placeHolder = "Send a message to ChatSensei...";
         vscode.window.showInputBox({ placeHolder: placeHolder })

@@ -16,6 +16,7 @@ let openai: any;
 let _context: vscode.ExtensionContext;
 let didSetApiKey: boolean = false;
 let processing: boolean = false;
+let currentRole = tasks['default'];
 export let conversation: Message[] = [tasks.default];
 
 async function init(context: vscode.ExtensionContext) {
@@ -114,10 +115,11 @@ function unsetKey(notifyUser: boolean = false) {
 }
 
 function codeAction(task: string, text: string) {
-    query(text, task);
+    setRole(tasks[task]);
+    query(text);
 }
 
-async function query(content: string, task: string = 'default') {
+async function query(content: string) {
     if (processing) { return; }
 
     if (!didSetApiKey) {
@@ -132,7 +134,7 @@ async function query(content: string, task: string = 'default') {
     try {
 
         // Set context for conversation
-        setRole(tasks[task]);
+        setRole(currentRole);
         conversation.push({ role: "user", content: content });
 
         // Prepare webview panel
@@ -196,7 +198,8 @@ async function query(content: string, task: string = 'default') {
 function setRole(role: Message) {
     role = JSON.parse(JSON.stringify(role));
     delete role.title;
-    conversation[0] = role;
+    currentRole = role;
+    conversation[0] = currentRole;
 }
 
 function resetConversation() {
@@ -214,4 +217,4 @@ function encode(str: any) {
     return String(Buffer.from(String(str), 'binary').toString('base64'));
 }
 
-export { init, requestKey, unsetKey, query, codeAction, resetConversation };
+export { init, requestKey, unsetKey, setRole, query, codeAction, resetConversation };

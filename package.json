@@ -8,7 +8,7 @@
         "type": "git",
         "url": "https://github.com/rongxin-liu/ChatSensei.git"
     },
-    "version": "1.0.6",
+    "version": "1.0.7",
     "preview": true,
     "engines": {
         "vscode": "^1.76.0"
@@ -34,6 +34,10 @@
             {
                 "command": "chatsensei.exitImmersiveMode",
                 "title": "ChatSensei: Exit Immersive Mode"
+            },
+            {
+                "command": "chatsensei.setRole",
+                "title": "ChatSensei: Set System Role"
             },
             {
                 "command": "chatsensei.query",
