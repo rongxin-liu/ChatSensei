@@ -10,10 +10,9 @@ export interface Message {
     title?: string;
 }
 
-const TIMEOUT = 5000; // ms
+const TIMEOUT = 10000; // ms
 
 let openai: any;
-let configuration: any;
 let _context: vscode.ExtensionContext;
 let didSetApiKey: boolean = false;
 let processing: boolean = false;
@@ -22,7 +21,9 @@ export let conversation: Message[] = [tasks.default];
 async function init(context: vscode.ExtensionContext) {
     _context = context;
     const key = context.globalState.get('chatsensei.apiKey');
-    key !== undefined ? activateOpenAI(decode(key)) : null;
+    if (key !== undefined) {
+        setKey(decode(key)) ? activateOpenAI(String(decode(key))) : null;
+    }
 }
 
 async function requestKey() {
@@ -31,7 +32,7 @@ async function requestKey() {
         placeHolder: 'sk-',
         ignoreFocusOut: true,
     }).then((value) => {
-        value?.trim().length !== 0
+        setKey(value)
         ? activateOpenAI(String(value))
         : vscode.window.showWarningMessage('API key is empty');
     });
@@ -44,10 +45,7 @@ async function activateOpenAI(key: string) {
         openai = new OpenAIApi(new Configuration({ apiKey: key.trim() }));
 
         // Validate API key and connection to OpenAI API server
-        if (await healthCheck()) {
-            _context.globalState.update('chatsensei.apiKey', encode(key));
-            didSetApiKey = true;
-        }
+        await healthCheck();
 
     } catch (error) {
         console.log(error);
@@ -67,11 +65,17 @@ async function healthCheck() {
             openai.listModels(),
             new Promise((_, reject) =>
                 timer = setTimeout(() => {
-                    const errorMessage = `Timeout (${TIMEOUT}ms) while trying to reach OpenAI API server: Service may be down or not available.`;
+                    const errorMessage = `Timeout (>${TIMEOUT/1000}s) while trying to reach OpenAI API server: Service may be down or not available.`;
                     vscode.window.showErrorMessage(errorMessage);
                     reject(new Error(errorMessage));
                 }, TIMEOUT)
             )]).catch((error: any) => {
+
+                // check if error is ENOTFOUND
+                if (error.code === 'ENOTFOUND') {
+                    vscode.window.showErrorMessage(`Could not reach OpenAI API server: You may be offline or the service may be down.`);
+                    return false;
+                }
 
                 // If API key is invalid, unset it
                 if (error.response.status === 401) {
@@ -91,6 +95,15 @@ async function healthCheck() {
         vscode.window.showErrorMessage(`Encountered error while trying to activate OpenAI API service: ${error}`);
         return false;
     }
+}
+
+function setKey(key: any) {
+    if (key.trim().length !== 0) {
+        _context.globalState.update('chatsensei.apiKey', encode(key));
+        didSetApiKey = true;
+        return true;
+    }
+    return false;
 }
 
 function unsetKey(notifyUser: boolean = false) {
@@ -116,14 +129,18 @@ async function query(content: string, task: string = 'default') {
         return;
     }
 
-    createWebviewPanel(_context);
-    setRole(tasks[task]);
-
-    conversation.push({ role: "user", content: content });
-    updateWebviewPanel(conversation);
-    sendWebviewCommand('scroll_to_bottom');
-    sendWebviewCommand('disable_input');
     try {
+
+        // Set context for conversation
+        setRole(tasks[task]);
+        conversation.push({ role: "user", content: content });
+
+        // Prepare webview panel
+        createWebviewPanel(_context, conversation);
+        sendWebviewCommand('scroll_to_bottom');
+        sendWebviewCommand('disable_input');
+
+        // Create chat completion
         const response = await openai.createChatCompletion(
             {
                 model: "gpt-3.5-turbo",
@@ -131,7 +148,7 @@ async function query(content: string, task: string = 'default') {
                 stream: true
             }, { responseType: 'stream' });
 
-
+        // Process stream data
         conversation.push({ role: "assistant", content: '' });
         let buffer: string = '';
         response.data.on('data', (data: { toString: () => string; }) => {
@@ -180,7 +197,6 @@ function setRole(role: Message) {
     role = JSON.parse(JSON.stringify(role));
     delete role.title;
     conversation[0] = role;
-    updateWebviewPanel(conversation);
 }
 
 function resetConversation() {

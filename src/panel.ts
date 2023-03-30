@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { query, conversation, Message } from './model';
+import { query, Message, conversation } from './model';
 const highlightjs = require('markdown-it-highlightjs');
 const md = require('markdown-it')();
 md.use(highlightjs);
@@ -7,8 +7,9 @@ md.use(highlightjs);
 const STATICS = 'statics';
 let panel: vscode.WebviewPanel | undefined;
 
-function createWebviewPanel(context: vscode.ExtensionContext) {
+function createWebviewPanel(context: vscode.ExtensionContext, conversation: any) {
     if (panel) {
+        updateWebviewPanel(conversation);
         panel.reveal(vscode.ViewColumn.Beside);
         return;
     }
@@ -92,7 +93,7 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
 
     panel.webview.html = htmlString;
 
-    if (conversation.length >= 2) {
+    if (conversation.length > 0) {
         updateWebviewPanel(conversation);
     }
 
@@ -135,7 +136,7 @@ function flattenMessages(messages: Message[]) {
 }
 
 function openPanel(context: vscode.ExtensionContext) {
-    panel === undefined ? createWebviewPanel(context) : null;
+    panel === undefined ? createWebviewPanel(context, conversation) : null;
 }
 
 function sendWebviewCommand(command: string) {
