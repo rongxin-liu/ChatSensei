@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     commands.push(
         vscode.commands.registerCommand('chatsensei.unsetKey', () => {
-            model.unsetKey();
+            model.unsetKey(true);
         }));
 
     commands.push(

@@ -4,12 +4,13 @@ import { createWebviewPanel, sendWebviewCommand, updateWebviewPanel } from './pa
 import { tasks } from './tasks';
 const { Configuration, OpenAIApi } = require("openai");
 
-
 export interface Message {
     role: string;
     content: string;
     title?: string;
 }
+
+const TIMEOUT = 5000; // ms
 
 let openai: any;
 let configuration: any;
@@ -21,7 +22,7 @@ export let conversation: Message[] = [tasks.default];
 async function init(context: vscode.ExtensionContext) {
     _context = context;
     const key = context.globalState.get('chatsensei.apiKey');
-    key !== undefined ? setKey(decode(key)) : null;
+    key !== undefined ? activateOpenAI(decode(key)) : null;
 }
 
 async function requestKey() {
@@ -30,21 +31,24 @@ async function requestKey() {
         placeHolder: 'sk-',
         ignoreFocusOut: true,
     }).then((value) => {
-        setKey(value || '');
-        value ? vscode.window.showInformationMessage('API key set successfully') : null;
+        value?.trim().length !== 0
+        ? activateOpenAI(String(value))
+        : vscode.window.showWarningMessage('API key is empty');
     });
 }
 
-function setKey(key: string) {
+async function activateOpenAI(key: string) {
     try {
-        key = key.trim();
-        if (key.length === 0) {
-            throw new Error('API key is empty');
+
+        // Instantiate OpenAI API client
+        openai = new OpenAIApi(new Configuration({ apiKey: key.trim() }));
+
+        // Validate API key and connection to OpenAI API server
+        if (await healthCheck()) {
+            _context.globalState.update('chatsensei.apiKey', encode(key));
+            didSetApiKey = true;
         }
-        configuration = new Configuration({ apiKey: key });
-        openai = new OpenAIApi(configuration);
-        _context.globalState.update('chatsensei.apiKey', encode(key));
-        didSetApiKey = true;
+
     } catch (e) {
         console.log(e);
         vscode.window.showErrorMessage(`Failed to set API key: ${e}`);
@@ -53,11 +57,47 @@ function setKey(key: string) {
     return true;
 }
 
-function unsetKey() {
+async function healthCheck() {
+    let timer: any;
+    try {
+        return Promise.race([
+
+            // Use list models API to validate API key and connection
+            // https://platform.openai.com/docs/api-reference/models
+            openai.listModels(),
+            new Promise((_, reject) =>
+                timer = setTimeout(() => {
+                    const errorMessage = `Timeout (${TIMEOUT}ms) while trying to reach OpenAI API server: Service may be down or not available.`;
+                    vscode.window.showErrorMessage(errorMessage);
+                    reject(new Error(errorMessage));
+                }, TIMEOUT)
+            )]).catch((error: any) => {
+
+                // If API key is invalid, unset it
+                if (error.response.status === 401) {
+                    console.log(error.response.data);
+                    vscode.window.showErrorMessage(error.response.message);
+                    unsetKey();
+                } else {
+                    console.log(error);
+                    vscode.window.showErrorMessage(`Encountered error while trying to connect OpenAI API service: ${error}`);
+                }
+                return false;
+            }).finally(() => {
+                clearTimeout(timer);
+            });
+    } catch (error) {
+        console.log(error);
+        vscode.window.showErrorMessage(`Encountered error while trying to activate OpenAI API service: ${error}`);
+        return false;
+    }
+}
+
+function unsetKey(notifyUser: boolean = false) {
     openai = new OpenAIApi(new Configuration());
     _context.globalState.update('chatsensei.apiKey', undefined);
     didSetApiKey = false;
-    vscode.window.showInformationMessage('OpenAI API key has been unset');
+    notifyUser ? vscode.window.showInformationMessage('OpenAI API key has been unset') : null;
 }
 
 function codeAction(task: string, text: string) {
@@ -66,7 +106,11 @@ function codeAction(task: string, text: string) {
 
 async function query(content: string, task: string = 'default') {
     if (processing) { return; }
-    !didSetApiKey ? await requestKey() : null;
+
+    if (!didSetApiKey) {
+        await requestKey();
+    }
+
     createWebviewPanel(_context);
     setRole(tasks[task]);
 
@@ -121,8 +165,8 @@ async function query(content: string, task: string = 'default') {
         });
     }
     catch (error: any) {
+        didSetApiKey ? await healthCheck() : console.log(error);
         processing = false;
-        console.log(error.response.data);
     }
 }
 

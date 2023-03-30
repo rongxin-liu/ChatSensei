@@ -12,6 +12,7 @@ function createWebviewPanel(context: vscode.ExtensionContext) {
         panel.reveal(vscode.ViewColumn.Beside);
         return;
     }
+
     panel = vscode.window.createWebviewPanel(
         'chatsensei',
         `ChatSensei`,
