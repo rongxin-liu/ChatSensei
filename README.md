@@ -1,19 +1,21 @@
 # ChatSensei
 
-No more switching between web browsers, ChatSensei offers a full ChatGPT experience in VS Code, allowing users to interact with GPT seamlessly. It also adds common quick-fix programming features such as code completion, translation, review, commenting, etc. It could also perform other general-purpose tasks that GPT models offer.
+Say goodbye to switching between web browsers and VS Code! ChatSensei brings the full ChatGPT experience right into your VS Code environment, allowing you to interact with GPT seamlessly. It also offers common quick-fix programming features such as code completion, translation, review, commenting, and much more. Additionally, it can handle various general-purpose tasks that GPT models offer.
 
 ![Alt Text](https://raw.githubusercontent.com/rongxin-liu/ChatSensei/main/images/demo.gif)
 
 ## Features
-
-1. ChatGPT in your VS Code.
-2. Perform quick-fix code action on any selected code snippet (offers optimization, debugging, testing suggestions, and more).
-3. One-click copy-paste code snippet from the chat panel to VS Code editor.
+- ChatGPT in your VS Code.
+- Perform quick-fix code actions on any selected code snippet (e.g., optimization, debugging, testing suggestions, etc.).
+- System role customization (e.g., message provides the initial instructions to the model).
+- One-click copy-paste code snippets from the chat panel to the VS Code editor.
 
 ## Usage
 
-1. Select a range of code snippets in the text editor and choose a code action from the quick-fix menu to query the GPT model for suggestions.
-2. Use it as a general assistant and ask ChatGPT anything within VS Code. Open the command palette and search `Ask ChatSensei` or `Open Panel`. Ask anything you want.
+- Select a range of code snippets in the text editor and choose a code action from the quick-fix menu to query the GPT model for suggestions.
+- Use it as a virtual assistant and ask ChatGPT anything within VS Code. Simply open the Command Palette and search for `Ask ChatSensei` or `Open Panel`, and enter your query.
+- Use `Set System Role` to customize the task domain of the GPT model.
+- Press `Ctrl+Alt+Z` to enter (`Ctrl+Alt+X` to exit) immersive mode.
 
 ## Requirements
 
