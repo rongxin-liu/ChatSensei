@@ -15,6 +15,21 @@ export function activate(context: vscode.ExtensionContext) {
         }));
 
     commands.push(
+        vscode.commands.registerCommand('chatsensei.enterImmersiveMode', async () => {
+            vscode.window.terminals.forEach((terminal) => { terminal.dispose(); });
+            await vscode.commands.executeCommand('workbench.action.focusSideBar');
+            await vscode.commands.executeCommand('workbench.action.toggleSidebarVisibility');
+            await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+            panel.openPanel(context);
+        }));
+
+    commands.push(
+        vscode.commands.registerCommand('chatsensei.exitImmersiveMode', async () => {
+            await vscode.commands.executeCommand('workbench.action.focusSideBar');
+            await vscode.commands.executeCommand('workbench.action.terminal.new');
+        }));
+
+    commands.push(
         vscode.commands.registerCommand('chatsensei.query', () => {
         const placeHolder = "Send a message to ChatSensei...";
         vscode.window.showInputBox({ placeHolder: placeHolder })

@@ -28,6 +28,14 @@
                 "title": "ChatSensei: Open Panel"
             },
             {
+                "command": "chatsensei.enterImmersiveMode",
+                "title": "ChatSensei: Enter Immersive Mode"
+            },
+            {
+                "command": "chatsensei.exitImmersiveMode",
+                "title": "ChatSensei: Exit Immersive Mode"
+            },
+            {
                 "command": "chatsensei.query",
                 "title": "ChatSensei: Ask ChatSensei"
             },
@@ -46,6 +54,16 @@
             {
                 "command": "chatsensei.unsetKey",
                 "title": "ChatSensei: Unset OpenAI API Key"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "ctrl+alt+z",
+                "command": "chatsensei.enterImmersiveMode"
+            },
+            {
+                "key": "ctrl+alt+x",
+                "command": "chatsensei.exitImmersiveMode"
             }
         ]
     },
