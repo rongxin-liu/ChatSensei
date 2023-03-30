@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.querySelector('#chatInput textarea');
     textarea.focus();
     textarea.addEventListener('keypress', (event) => {
-        if (event.key === "Enter" && event.ctrlKey) {
+        if (event.key === "Enter" && (event.ctrlKey || event.shiftKey)) {
             event.preventDefault();
             let textBox = event.target;
             textBox.value = textBox.value.slice(0, textBox.selectionStart) + "\n" + textBox.value.slice(textBox.selectionEnd);
