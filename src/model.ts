@@ -49,9 +49,9 @@ async function activateOpenAI(key: string) {
             didSetApiKey = true;
         }
 
-    } catch (e) {
-        console.log(e);
-        vscode.window.showErrorMessage(`Failed to set API key: ${e}`);
+    } catch (error) {
+        console.log(error);
+        vscode.window.showErrorMessage(`Failed to set API key: ${error}`);
         return false;
     }
     return true;
@@ -111,6 +111,11 @@ async function query(content: string, task: string = 'default') {
         await requestKey();
     }
 
+    if (openai === undefined) {
+        vscode.window.showErrorMessage('OpenAI API client is not initialized');
+        return;
+    }
+
     createWebviewPanel(_context);
     setRole(tasks[task]);
 
@@ -166,6 +171,7 @@ async function query(content: string, task: string = 'default') {
     }
     catch (error: any) {
         didSetApiKey ? await healthCheck() : console.log(error);
+        sendWebviewCommand('enable_input');
         processing = false;
     }
 }
