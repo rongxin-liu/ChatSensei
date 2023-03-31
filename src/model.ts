@@ -16,6 +16,7 @@ let openai: any;
 let _context: vscode.ExtensionContext;
 let didSetApiKey: boolean = false;
 let processing: boolean = false;
+let currentModel = 'gpt-3.5-turbo';
 let currentRole = tasks['default'];
 export let conversation: Message[] = [tasks.default];
 
@@ -119,6 +120,23 @@ function codeAction(task: string, text: string) {
     query(text);
 }
 
+function setModel(model: string) {
+    openai.listModels().then((response: any) => {
+        if (response.data.data.filter((m: any) => m.id === model).length === 0) {
+            vscode.window.showErrorMessage(`Model ${model} is not available`);
+            return;
+        }});
+    currentModel = model;
+    vscode.window.showInformationMessage(`Model set to ${model}`);
+}
+
+function setRole(role: Message) {
+    role = JSON.parse(JSON.stringify(role));
+    delete role.title;
+    currentRole = role;
+    conversation[0] = currentRole;
+}
+
 async function query(content: string) {
     if (processing) { return; }
 
@@ -145,7 +163,7 @@ async function query(content: string) {
         // Create chat completion
         const response = await openai.createChatCompletion(
             {
-                model: "gpt-3.5-turbo",
+                model: currentModel,
                 messages: conversation,
                 stream: true
             }, { responseType: 'stream' });
@@ -195,13 +213,6 @@ async function query(content: string) {
     }
 }
 
-function setRole(role: Message) {
-    role = JSON.parse(JSON.stringify(role));
-    delete role.title;
-    currentRole = role;
-    conversation[0] = currentRole;
-}
-
 function resetConversation() {
     conversation = [tasks.default];
     updateWebviewPanel(conversation);
@@ -217,4 +228,4 @@ function encode(str: any) {
     return String(Buffer.from(String(str), 'binary').toString('base64'));
 }
 
-export { init, requestKey, unsetKey, setRole, query, codeAction, resetConversation };
+export { init, requestKey, unsetKey, setModel, setRole, query, codeAction, resetConversation };

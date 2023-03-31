@@ -30,6 +30,25 @@ export function activate(context: vscode.ExtensionContext) {
         }));
 
     commands.push(
+        vscode.commands.registerCommand('chatsensei.setModel', async () => {
+            await vscode.window.showQuickPick(
+                [
+                    'gpt-3.5-turbo',
+                    'gpt-4',
+                    'gpt-4-32k',
+                    'text-davinci-002',
+                    'text-davinci-003'
+                ], {
+                placeHolder: 'Select a model',
+                ignoreFocusOut: true,
+            }).then((value) => {
+                if (value !== undefined) {
+                    model.setModel(value);
+                }
+            });
+        }));
+
+    commands.push(
         vscode.commands.registerCommand('chatsensei.setRole', async () => {
             await vscode.window.showInputBox({
                 prompt: 'Please define the ',
