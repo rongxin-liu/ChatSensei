@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
                 ignoreFocusOut: true,
             }).then((value) => {
                 if (value !== undefined) {
-                    model.setModel(value);
+                    model.setModel(value, true);
                 }
             });
         }));

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { query, Message, conversation } from './model';
+import { query, currentModel, Message, conversation } from './model';
 const highlightjs = require('markdown-it-highlightjs');
 const md = require('markdown-it')();
 md.use(highlightjs);
@@ -16,7 +16,7 @@ function createWebviewPanel(context: vscode.ExtensionContext, conversation: any)
 
     panel = vscode.window.createWebviewPanel(
         'chatsensei',
-        `ChatSensei`,
+        `ChatSensei (${currentModel})`,
         vscode.ViewColumn.Beside,
         {
             enableScripts: true,
@@ -122,6 +122,10 @@ function updateWebviewPanel(content: any) {
         });
 }
 
+function updateWebviewTitle(title: string) {
+    panel ? panel.title = title : null;
+}
+
 // update each content field with parsed markdown
 function flattenMessages(messages: Message[]) {
     const tmp: Message[] = [];
@@ -143,4 +147,4 @@ function sendWebviewCommand(command: string) {
     panel?.webview.postMessage({ command: command });
 }
 
-export { createWebviewPanel, updateWebviewPanel, openPanel, sendWebviewCommand };
+export { createWebviewPanel, updateWebviewPanel, updateWebviewTitle, openPanel, sendWebviewCommand };

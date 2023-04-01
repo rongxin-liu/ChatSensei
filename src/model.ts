@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-import { createWebviewPanel, sendWebviewCommand, updateWebviewPanel } from './panel';
+import { createWebviewPanel, sendWebviewCommand, updateWebviewPanel, updateWebviewTitle } from './panel';
 import { tasks } from './tasks';
 const { Configuration, OpenAIApi } = require("openai");
 
@@ -16,8 +16,8 @@ let openai: any;
 let _context: vscode.ExtensionContext;
 let didSetApiKey: boolean = false;
 let processing: boolean = false;
-let currentModel = 'gpt-3.5-turbo';
 let currentRole = tasks['default'];
+export let currentModel = 'gpt-3.5-turbo';
 export let conversation: Message[] = [tasks.default];
 
 async function init(context: vscode.ExtensionContext) {
@@ -25,6 +25,10 @@ async function init(context: vscode.ExtensionContext) {
     const key = context.globalState.get('chatsensei.apiKey');
     if (key !== undefined) {
         setKey(decode(key)) ? activateOpenAI(String(decode(key))) : null;
+    }
+    const model = context.globalState.get('chatsensei.model');
+    if (model !== undefined) {
+        setModel(String(model));
     }
 }
 
@@ -120,14 +124,16 @@ function codeAction(task: string, text: string) {
     query(text);
 }
 
-function setModel(model: string) {
+function setModel(model: string, notifyUser: boolean = false) {
     openai.listModels().then((response: any) => {
         if (response.data.data.filter((m: any) => m.id === model).length === 0) {
             vscode.window.showErrorMessage(`Model ${model} is not available`);
             return;
         }});
     currentModel = model;
-    vscode.window.showInformationMessage(`Model set to ${model}`);
+    _context.globalState.update('chatsensei.model', model);
+    updateWebviewTitle(`ChatSensei (${model})`);
+    notifyUser ? vscode.window.showInformationMessage(`Model set to ${model}`) : null;
 }
 
 function setRole(role: Message) {
