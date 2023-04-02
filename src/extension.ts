@@ -35,9 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
                 [
                     'gpt-3.5-turbo',
                     'gpt-4',
-                    'gpt-4-32k',
-                    'text-davinci-002',
-                    'text-davinci-003'
+                    'gpt-4-32k'
                 ], {
                 placeHolder: 'Select a model',
                 ignoreFocusOut: true,
