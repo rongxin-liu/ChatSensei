@@ -129,11 +129,15 @@ function setModel(model: string, notifyUser: boolean = false) {
         if (response.data.data.filter((m: any) => m.id === model).length === 0) {
             vscode.window.showErrorMessage(`Model ${model} is not available`);
             return;
-        }});
-    currentModel = model;
-    _context.globalState.update('chatsensei.model', model);
-    updateWebviewTitle(`ChatSensei (${model})`);
-    notifyUser ? vscode.window.showInformationMessage(`Model set to ${model}`) : null;
+        }
+        currentModel = model;
+        _context.globalState.update('chatsensei.model', model);
+        updateWebviewTitle(`ChatSensei (${model})`);
+        notifyUser ? vscode.window.showInformationMessage(`Model set to ${model}`) : null;
+    }).catch((error: any) => {
+        console.log(error);
+        vscode.window.showErrorMessage(`Encountered error while trying to set model: ${error}`);
+    });
 }
 
 function setRole(role: Message) {
