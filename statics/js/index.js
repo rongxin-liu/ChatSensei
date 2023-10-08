@@ -18,13 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === "Enter" && (event.ctrlKey || event.shiftKey)) {
             event.preventDefault();
             let textBox = event.target;
-            textBox.value = textBox.value.slice(0, textBox.selectionStart) + "\n" + textBox.value.slice(textBox.selectionEnd);
+            let startPos = textBox.selectionStart;
+            let endPos = textBox.selectionEnd;
+            textBox.value = textBox.value.slice(0, startPos) + "\n" + textBox.value.slice(endPos);
+            // set cursor to the new line
+            textBox.selectionStart = startPos + 1;
+            textBox.selectionEnd = startPos + 1;
         } else if (event.key === 'Enter' && event.target.value) {
             event.preventDefault();
             sendMessage(event.target.value);
             event.target.value = '';
         }
-
     });
 
     window.addEventListener('message', event => {
