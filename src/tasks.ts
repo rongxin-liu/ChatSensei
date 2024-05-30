@@ -15,7 +15,7 @@ const tasks: TasksDictionary = {
     'default': {
         title: 'General Conversation',
         role: "system",
-        content: "You are a helpful assistant."
+        content: "Please strictly follow user instructions and their provided facts."
     },
     'codeOptimiation': {
         title: 'Optimize this code',
